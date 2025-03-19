@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          UserRole  @default(CREW)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  flights       Flight[]  @relation("CrewFlights")
+  notifications Notification[]
+}
+
+model Passenger {
+  id                String    @id @default(cuid())
+  firstName         String
+  lastName          String
+  email            String?   @unique
+  phone            String?
+  dietaryRestrictions String[]
+  seatPreference    String?
+  temperaturePreference Int?
+  drinkPreferences   String[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  flights          PassengerFlight[]
+  notifications    Notification[]
+}
+
+model Flight {
+  id              String    @id @default(cuid())
+  flightNumber    String    @unique
+  departureTime   DateTime
+  arrivalTime     DateTime
+  origin          String
+  destination     String
+  status          FlightStatus @default(SCHEDULED)
+  crew            User[]    @relation("CrewFlights")
+  passengers      PassengerFlight[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model PassengerFlight {
+  id          String    @id @default(cuid())
+  passenger   Passenger @relation(fields: [passengerId], references: [id])
+  passengerId String
+  flight      Flight    @relation(fields: [flightId], references: [id])
+  flightId    String
+  seatNumber  String?
+  checkedIn   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([passengerId, flightId])
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  type        NotificationType
+  message     String
+  status      NotificationStatus @default(PENDING)
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?
+  passenger   Passenger? @relation(fields: [passengerId], references: [id])
+  passengerId String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  action      String
+  entityType  String
+  entityId    String
+  changes     Json
+  performedBy String
+  createdAt   DateTime  @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  CREW
+}
+
+enum FlightStatus {
+  SCHEDULED
+  BOARDING
+  DEPARTED
+  ARRIVED
+  CANCELLED
+}
+
+enum NotificationType {
+  SMS
+  EMAIL
+  SYSTEM
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
