@@ -15,7 +15,7 @@ objectives.
 - This is a proof-of-concept, and in the real world I would use a PostgreSQL or NoSQL database to store client information. This is easily done, especially with codegen tools.
 
 ## Tools Used
-bolt.dev for scaffolding
-Claude 3.7 Extended Reasoning for hammering out my thoughts
-Windsurf IDE because I ran out of the Cursor free trial
-My brain (somewhat)
+- bolt.dev for scaffolding
+- Claude 3.7 Extended Reasoning for hammering out my thoughts
+- Windsurf IDE because I ran out of the Cursor free trial
+- My brain (somewhat)
